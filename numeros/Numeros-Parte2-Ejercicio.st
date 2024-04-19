@@ -35,16 +35,11 @@ test06EnteroMultipliesWithEnteroCorrectly
 
 	self assert: four equals: two * two! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'MB 4/13/2024 15:49:33'!
+!NumeroTest methodsFor: 'tests' stamp: 'MB 4/19/2024 12:36:23'!
 test07EnteroDividesEnteroCorrectly
-
-	|a b|
-	a := one.
-	b := two / two.
-
 	self assert: one equals: two / two! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'fs 4/12/2024 20:53:16'!
+!NumeroTest methodsFor: 'tests' stamp: 'MB 4/19/2024 12:36:35'!
 test08FraccionAddsWithFraccionCorrectly
 "
     La suma de fracciones es:
@@ -54,10 +49,9 @@ test08FraccionAddsWithFraccionCorrectly
 	SI ESTAN PENSANDO EN LA REDUCCION DE FRACCIONES NO SE PREOCUPEN!!
 	TODAVIA NO SE ESTA TESTEANDO ESE CASO
 "
-	| sevenTenths a|
+	| sevenTenths|
 
 	sevenTenths := (Entero with: 7) / (Entero with: 10).
-	a := oneFifth + oneHalf.
 	self assert: sevenTenths equals: oneFifth + oneHalf! !
 
 !NumeroTest methodsFor: 'tests' stamp: 'JS 5/5/2022 03:41:20'!
@@ -271,9 +265,9 @@ test42SignIsCorrectlyAssignedToFractionWithNegativeDivisor
 	self assert: oneHalf negated equals: (one / negativeTwo)! !
 
 
-!NumeroTest methodsFor: 'setup' stamp: 'MB 4/13/2024 14:50:15'!
+!NumeroTest methodsFor: 'setup' stamp: 'fs 4/18/2024 00:19:14'!
 setUp
-
+	
 	zero := Entero with: 0.
 	one := Entero with: 1.
 	two := Entero with: 2.
@@ -288,7 +282,8 @@ setUp
 	oneFifth := one / five.
 	twoFifth := two / five.
 	twoTwentyfifth := two / (Entero with: 25).
-	fiveHalfs := five / two.! !
+	fiveHalfs := five / two.
+	! !
 
 
 !classDefinition: #Numero category: #'Numeros-Parte2-Ejercicio'!
@@ -389,6 +384,14 @@ Numero subclass: #Entero
 / aDivisor 
 	
 	^ aDivisor dividesInteger: self.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'fs 4/17/2024 09:20:04'!
+< otherInteger
+	^value < otherInteger integerValue.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'fs 4/16/2024 22:02:50'!
+> otherInteger
+	^value > otherInteger integerValue.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MB 4/13/2024 14:28:05'!
 fibonacci
@@ -813,21 +816,170 @@ timesInteger: anInteger
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'public' stamp: 'fs 4/16/2024 19:32:04'!
+fitsNumerator: aNumerator over: aDenominator
+
+	self subclassResponsibility.! !
+
+
+!Fraccion class methodsFor: 'instance creation' stamp: 'fs 4/17/2024 23:49:49'!
+with: aDividend over: aDivisor
+	|aSubclass|
+	
+	aSubclass := self subclasses detect: [ :subclass | subclass fitsNumerator: aDividend over: aDivisor ].
+	
+	^aSubclass with: aDividend over: aDivisor.
+! !
+
+
+!classDefinition: #Invalid category: #'Numeros-Parte2-Ejercicio'!
+Fraccion subclass: #Invalid
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Invalid class' category: #'Numeros-Parte2-Ejercicio'!
+Invalid class
+	instanceVariableNames: ''!
+
+!Invalid class methodsFor: 'public' stamp: 'fs 4/16/2024 21:14:28'!
+fitsNumerator: aNumerator over: aDenominator
+	^ aDenominator = (Entero with: 0).! !
+
+
+!Invalid class methodsFor: 'instance creation' stamp: 'fs 4/16/2024 21:02:19'!
+with: aDividend over: aDivisor
+	self error: self canNotDivideByZeroErrorDescription! !
+
+
+!classDefinition: #NegativeDivisor category: #'Numeros-Parte2-Ejercicio'!
+Fraccion subclass: #NegativeDivisor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'NegativeDivisor class' category: #'Numeros-Parte2-Ejercicio'!
+NegativeDivisor class
+	instanceVariableNames: ''!
+
+!NegativeDivisor class methodsFor: 'public' stamp: 'fs 4/17/2024 09:34:01'!
+fitsNumerator: aNumerator over: aDenominator
+	^ (aDenominator = (Entero with: 0)) not and: [(( aDenominator) < (Entero with: 0))].! !
+
+
+!NegativeDivisor class methodsFor: 'instance creation' stamp: 'fs 4/17/2024 09:40:03'!
+with: aDividend over: aDivisor
+	| newDividend newDivisor |
+	newDividend := aDividend negated. 
+	newDivisor := aDivisor negated.
+	^RegularFraction with: newDividend over: newDivisor.! !
+
+
+!classDefinition: #RegularFraction category: #'Numeros-Parte2-Ejercicio'!
+Fraccion subclass: #RegularFraction
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'RegularFraction class' category: #'Numeros-Parte2-Ejercicio'!
+RegularFraction class
+	instanceVariableNames: ''!
+
+!RegularFraction class methodsFor: 'public' stamp: 'fs 4/17/2024 09:39:31'!
+fitsNumerator: aNumerator over: aDenominator
+	^ (((aDenominator = (Entero with: 0)) not) and: [ ((aDenominator) > (Entero with: 0))]).! !
+
+
+!RegularFraction class methodsFor: 'instance creation' stamp: 'MB 4/19/2024 12:33:19'!
 with: aDividend over: aDivisor
 
-	| greatestCommonDivisor numerator denominator |
-	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
-	
-	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
-	
+	| denominator greatestCommonDivisor numerator 	aSubclass|
 	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
 	numerator := aDividend // greatestCommonDivisor.
 	denominator := aDivisor // greatestCommonDivisor.
 	
-	denominator isOne ifTrue: [ ^numerator ].
+	aSubclass := self subclasses detect: [ :subclass | subclass fitsNumerator: numerator over: denominator ].
+	
+	^aSubclass with: numerator over: denominator .
+! !
 
-	^self new initializeWith: numerator over: denominator
+
+!classDefinition: #DenominatorDifferentThanOne category: #'Numeros-Parte2-Ejercicio'!
+RegularFraction subclass: #DenominatorDifferentThanOne
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'DenominatorDifferentThanOne class' category: #'Numeros-Parte2-Ejercicio'!
+DenominatorDifferentThanOne class
+	instanceVariableNames: ''!
+
+!DenominatorDifferentThanOne class methodsFor: 'public' stamp: 'fs 4/18/2024 00:18:59'!
+fitsNumerator: aNumerator over: aDenominator
+	^ (aDenominator = (Entero with: 1)) not.! !
+
+
+!DenominatorDifferentThanOne class methodsFor: 'instance creation' stamp: 'fs 4/18/2024 00:06:15'!
+with: aDividend over: aDivisor
+
+	^self new initializeWith: aDividend over: aDivisor.! !
+
+
+!classDefinition: #DenominatorEqualToOne category: #'Numeros-Parte2-Ejercicio'!
+RegularFraction subclass: #DenominatorEqualToOne
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'DenominatorEqualToOne class' category: #'Numeros-Parte2-Ejercicio'!
+DenominatorEqualToOne class
+	instanceVariableNames: ''!
+
+!DenominatorEqualToOne class methodsFor: 'public' stamp: 'fs 4/18/2024 00:14:07'!
+fitsNumerator: aNumerator over: aDenominator
+	^ aDenominator  = (Entero with: 1).! !
+
+
+!DenominatorEqualToOne class methodsFor: 'instance creation' stamp: 'fs 4/18/2024 00:05:02'!
+with: aDividend over: aDivisor
+	^aDividend 
+
 	! !
+
+
+!classDefinition: #ZeroNumerator category: #'Numeros-Parte2-Ejercicio'!
+Fraccion subclass: #ZeroNumerator
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ZeroNumerator class' category: #'Numeros-Parte2-Ejercicio'!
+ZeroNumerator class
+	instanceVariableNames: ''!
+
+!ZeroNumerator class methodsFor: 'public' stamp: 'fs 4/16/2024 21:42:59'!
+fitsNumerator: aNumerator over: aDenominator
+	^ (aDenominator = (Entero with: 0)) not and: [(aNumerator = (Entero with: 0))].! !
+
+
+!ZeroNumerator class methodsFor: 'instance creation' stamp: 'fs 4/16/2024 21:04:18'!
+with: aDividend over: aDivisor
+	^aDividend ! !
