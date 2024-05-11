@@ -5,13 +5,13 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 17:51:22'!
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 13:48:02'!
 test01_AnEmptyPortfolioHas0Balance
-	|portfolio|
+	|emptyPortfolio|
 	
-	portfolio := Portfolio new.
+	emptyPortfolio := Portfolio new.
 		
-	self assert: (portfolio hasBalance: 0 * peso).! !
+	self assert: (emptyPortfolio hasBalance: 0 * peso).! !
 
 !PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 17:50:40'!
 test02_PortfolioWithASingleAccountCalculatesTheBalanceCorrectly
@@ -25,92 +25,98 @@ test02_PortfolioWithASingleAccountCalculatesTheBalanceCorrectly
 	
 	self assert: (portfolio hasBalance: 100 * peso).! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 17:50:35'!
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 13:50:02'!
 test03_PortfolioWithTwoAccountsCalculatesTheBalanceCorrectly
-	|portfolio account1 account2|
+	| aPortfolio accountWithDeposit accountWithWithdrawl |
 	
-	portfolio := Portfolio new.
-	account1 := ReceptiveAccount new.
-	account2 := ReceptiveAccount new.
-	Deposit register: 500 * peso on: account1.
-	Withdraw register: 80 * peso on: account2.
+	aPortfolio := Portfolio new.
+	accountWithDeposit := ReceptiveAccount new.
+	accountWithWithdrawl := ReceptiveAccount new.
+	Deposit register: 500 * peso on: accountWithDeposit.
+	Withdraw register: 80 * peso on: accountWithWithdrawl.
 	
-	portfolio addAll: {account1. account2}.
+	aPortfolio addAll: {accountWithDeposit. accountWithWithdrawl}.
 	
-	self assert: (portfolio hasBalance: 420 * peso).! !
+	self assert: (aPortfolio hasBalance: 420 * peso).! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 17:58:46'!
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 13:57:32'!
 test04_PortfoliosInPortfolioCalculatesTheBalanceCorrectly
-	|portfolio portfolioChild1 portfolioChild2 account1 account2|
+	|aPortfolio childPortfolioWithADeposit childPortfolioWithAWithdrawl accountWithADeposit accountWithAWithdrawl|
 	
-	portfolio := Portfolio new.
-	portfolioChild1 := Portfolio new.
-	portfolioChild2 := Portfolio new.
+	aPortfolio := Portfolio new.
+	childPortfolioWithADeposit := Portfolio new.
+	childPortfolioWithAWithdrawl := Portfolio new.
 	
-	account1 := ReceptiveAccount new.
-	account2 := ReceptiveAccount new.
-	Deposit register: 500 * peso on: account1.
-	Withdraw register: 80 * peso on: account2.
+	accountWithADeposit := ReceptiveAccount new.
+	accountWithAWithdrawl := ReceptiveAccount new.
+	Deposit register: 500 * peso on: accountWithADeposit.
+	Withdraw register: 80 * peso on: accountWithAWithdrawl.
 	
-	portfolioChild1 add: account1.
-	portfolioChild2 add: account2.
-	portfolio addAll: {portfolioChild1. portfolioChild2}.
+	childPortfolioWithADeposit add: accountWithADeposit.
+	childPortfolioWithAWithdrawl add: accountWithAWithdrawl.
 	
-	self assert: (portfolio hasBalance: 420 * peso).! !
+	aPortfolio addAll: {childPortfolioWithADeposit. childPortfolioWithAWithdrawl}.
+	
+	self assert: (aPortfolio hasBalance: 420 * peso).! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 17:58:11'!
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 14:00:57'!
 test05_PortfolioWithAccountsAndPortfoliosCalculatesTheBalanceCorrectly
-	|portfolio portfolioChild1 portfolioChild2 account1 account2 account3|
+	|aPortfolio childPortfolioWithADeposit childPortfolioWithWithdrawl accountWithDeposit accountWithWithdrawl accountWithDepositStoredInRootPortfolio|
 	
-	portfolio := Portfolio new.
-	portfolioChild1 := Portfolio new.
-	portfolioChild2 := Portfolio new.
+	aPortfolio := Portfolio new.
+	childPortfolioWithADeposit := Portfolio new.
+	childPortfolioWithWithdrawl := Portfolio new.
 	
-	account1 := ReceptiveAccount new.
-	account2 := ReceptiveAccount new.
-	account3 := ReceptiveAccount new.
-	Deposit register: 400 * peso on: account1.
-	Withdraw register: 80 * peso on: account2.
-	Deposit register: 100 * peso on: account3.
+	accountWithDeposit := ReceptiveAccount new.
+	accountWithWithdrawl := ReceptiveAccount new.
+	accountWithDepositStoredInRootPortfolio := ReceptiveAccount new.
 	
-	portfolioChild1 add: account1.
-	portfolioChild2 add: account2.
-	portfolio addAll: {portfolioChild1. portfolioChild2. account3}.
+	Deposit register: 400 * peso on: accountWithDeposit.
+	Withdraw register: 80 * peso on: accountWithWithdrawl.
+	Deposit register: 100 * peso on: accountWithDepositStoredInRootPortfolio.
 	
-	self assert: (portfolio hasBalance: 420 * peso).! !
+	childPortfolioWithADeposit add: accountWithDeposit.
+	childPortfolioWithWithdrawl add: accountWithWithdrawl.
+	aPortfolio addAll: {childPortfolioWithADeposit. childPortfolioWithWithdrawl. accountWithDepositStoredInRootPortfolio}.
+	
+	self assert: (aPortfolio hasBalance: 420 * peso).! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 18:23:46'!
-test06_PortfolioWithAclientWithTransactionHasRegisteredThatTransaction
-	|portfolio clientAccount deposit|
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 14:38:29'!
+test06_PortfolioWithAclientWithATransactionKnowsThatTransaction
+	|aPortfolio clientAccountWithTransaction aDeposit |
 	
-	portfolio := Portfolio new.	
-	clientAccount := ReceptiveAccount new.
-	deposit := Deposit register: 100 * peso on: clientAccount.
+	aPortfolio := Portfolio new.	
+	clientAccountWithTransaction := ReceptiveAccount new.
+	
+	aDeposit := Deposit register: 100 * peso on: clientAccountWithTransaction.
 
-	portfolio add: clientAccount.
+	aPortfolio add: clientAccountWithTransaction.
 
-	self assert: (portfolio hasRegistered: deposit).! !
+	self assert: (aPortfolio hasRegistered: aDeposit).
+! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 18:31:56'!
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 14:36:31'!
 test07_PortfolioWithNoTransactionsReturnsAnEmptyCollectionWhenAskedForItsTransactions
-	|portfolio|
+	|anEmptyPortfolio|
 	
-	portfolio := Portfolio new.
+	anEmptyPortfolio := Portfolio new.
 	
-	self assert: portfolio transactions isEmpty.! !
+	self assert: anEmptyPortfolio transactions isEmpty.! !
 
-!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/3/2024 19:02:04'!
-test08_PortfolioWithAccountWithTwoTransactionsContainsTheTwoTransactions
-	|portfolio clientAccount deposit1 deposit2|
+!PortfolioTest methodsFor: 'testing' stamp: 'fs 5/10/2024 14:56:22'!
+test08_PortfolioWithAccountWithMultipleTransactionsKnowsThoseTransactions
+	|aPortfolio aReceptiveAccount aDeposit aWithdrawl|
 	
-	portfolio := Portfolio new.
-	clientAccount := ReceptiveAccount new.
-	deposit1 := Deposit register: 100 * peso on: clientAccount.
-	deposit2 := Deposit register: 200 * peso on: clientAccount.
+	aPortfolio := Portfolio new.
+	aReceptiveAccount := ReceptiveAccount new.
+	aDeposit := Deposit register: 100 * peso on: aReceptiveAccount.
+	aWithdrawl := Withdraw register: 200 * peso on: aReceptiveAccount.
 	
-	portfolio add: clientAccount.
+	aPortfolio add: aReceptiveAccount.
 	
-	self assert: (portfolio transactions = {deposit1. deposit2} asOrderedCollection).! !
+	self assert: (aPortfolio hasRegistered: aDeposit).
+	self assert: (aPortfolio hasRegistered: aWithdrawl).
+	self assert: 2 equals: (aPortfolio transactions size).! !
 
 
 !PortfolioTest methodsFor: 'validity' stamp: 'MB 5/4/2024 14:32:55'!
@@ -143,77 +149,77 @@ integrationTest
 	withExceptionDo: [:anError | self assert: Portfolio portfolioWithAlreadyContainedAccount equals: anError messageText].
 ! !
 
-!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/3/2024 19:24:57'!
+!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/10/2024 14:45:55'!
 test09_APortfolioCantAddTheSameAccountTwice
-	|portfolio clientAccount|
+	|aPortfolio aReceptiveAccount|
 	
-	portfolio := Portfolio new.
-	clientAccount := ReceptiveAccount new.
+	aPortfolio := Portfolio new.
+	aReceptiveAccount := ReceptiveAccount new.
 
-	portfolio add: clientAccount.
+	aPortfolio add: aReceptiveAccount.
 	
 	self 
-	should: [portfolio add: clientAccount] 
+	should: [aPortfolio add: aReceptiveAccount] 
 	raise: Error
 	withExceptionDo: [:anError | self assert: Portfolio alreadyContainedAccount equals: anError messageText].! !
 
-!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/3/2024 19:27:27'!
+!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/10/2024 14:50:08'!
 test10_APortfolioCantAddAnAccountContainedInASubPortfolio
-	|portfolio subPortfolio clientAccount|
+	|aPortfolio aSubPortfolio aReceptiveAccount|
 	
-	portfolio := Portfolio new.
-	subPortfolio := Portfolio new.
-	clientAccount := ReceptiveAccount new.
+	aPortfolio := Portfolio new.
+	aSubPortfolio := Portfolio new.
+	aReceptiveAccount := ReceptiveAccount new.
 	
-	subPortfolio add: clientAccount.
-	portfolio add: subPortfolio.
+	aSubPortfolio add: aReceptiveAccount.
+	aPortfolio add: aSubPortfolio.
 	
 	self 
-	should: [portfolio add: clientAccount] 
+	should: [aPortfolio add: aReceptiveAccount] 
 	raise: Error
 	withExceptionDo: [:anError | self assert: Portfolio alreadyContainedAccount equals: anError messageText].! !
 
-!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/3/2024 19:35:09'!
+!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/10/2024 14:49:52'!
 test11_APortfolioCantAddItself
-	|portfolio subPortfolio|
+	|aPortfolio aSubPortfolio|
 	
-	portfolio := Portfolio new.
-	subPortfolio := portfolio.
+	aPortfolio := Portfolio new.
+	aSubPortfolio := aPortfolio.
 	
 	self 
-	should: [portfolio add: subPortfolio] 
+	should: [aPortfolio add: aSubPortfolio] 
 	raise: Error
 	withExceptionDo: [:anError | self assert: Portfolio selfContained equals: anError messageText].! !
 
-!PortfolioTest methodsFor: 'validity' stamp: 'MB 5/4/2024 11:01:28'!
+!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/10/2024 14:48:48'!
 test12_APortfolioCantBeAddedToAPortfolioWhoseContainedElsewhereInAParentTree
-	|portfolio subPortfolio clientAccount|
+	|aPortfolio subPortfolio aReceptiveAccount|
 	
-	portfolio := Portfolio new.
+	aPortfolio := Portfolio new.
 	subPortfolio := Portfolio new.
-	clientAccount := ReceptiveAccount new.
+	aReceptiveAccount := ReceptiveAccount new.
 	
-	portfolio add: subPortfolio.
-	portfolio add: clientAccount.
+	aPortfolio add: subPortfolio.
+	aPortfolio add: aReceptiveAccount.
 	
 	self 
-	should: [subPortfolio add: clientAccount] 
+	should: [subPortfolio add: aReceptiveAccount] 
 	raise: Error
 	withExceptionDo: [:anError | self assert: Portfolio alreadyContainedAccount equals: anError messageText].! !
 
-!PortfolioTest methodsFor: 'validity' stamp: 'MB 5/4/2024 11:08:47'!
+!PortfolioTest methodsFor: 'validity' stamp: 'fs 5/10/2024 14:49:07'!
 test13_APortfolioCantAddAnotherPortfolioWithaAnAlreadyContainedAccount
-	|portfolio subPortfolio clientAccount|
+	|aPortfolio subPortfolio aReceptiveAccount|
 	
-	portfolio := Portfolio new.
+	aPortfolio := Portfolio new.
 	subPortfolio := Portfolio new.
-	clientAccount := ReceptiveAccount new.
+	aReceptiveAccount := ReceptiveAccount new.
 	
-	portfolio add: clientAccount.
-	subPortfolio add: clientAccount.
+	aPortfolio add: aReceptiveAccount.
+	subPortfolio add: aReceptiveAccount.
 	
 	self 
-	should: [portfolio add: subPortfolio] 
+	should: [aPortfolio add: subPortfolio] 
 	raise: Error
 	withExceptionDo: [:anError | self assert: Portfolio portfolioWithAlreadyContainedAccount equals: anError messageText].! !
 
@@ -225,87 +231,87 @@ TestCase subclass: #ReceptiveAccountTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:13'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:25'!
 test01_ReceptiveAccountHaveZeroAsBalanceWhenCreated 
 
-	| account |
+	| receptiveAccount |
 	
-	account := ReceptiveAccount new.
+	receptiveAccount := ReceptiveAccount new.
 
-	self assert: 0 equals: account balance
+	self assert: 0 equals: receptiveAccount balance
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:19'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:30'!
 test02_DepositIncreasesBalanceOnTransactionValue 
 
-	| account |
+	| receptiveAccount |
 	
-	account := ReceptiveAccount  new.
-	Deposit register: 100 * peso on: account.
+	receptiveAccount := ReceptiveAccount  new.
+	Deposit register: 100 * peso on: receptiveAccount.
 		
-	self assert: 100 * peso equals: account balance
+	self assert: 100 * peso equals: receptiveAccount balance
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:24'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:35'!
 test03_WithdrawDecreasesBalanceOnTransactionValue 
 
-	| account |
+	| receptiveAccount |
 	
-	account := ReceptiveAccount new.
-	Deposit register: 100 * peso on: account.
-	Withdraw register: 50 * peso on: account.
+	receptiveAccount := ReceptiveAccount new.
+	Deposit register: 100 * peso on: receptiveAccount.
+	Withdraw register: 50 * peso on: receptiveAccount.
 		
-	self assert: 50 * peso equals: account balance
+	self assert: 50 * peso equals: receptiveAccount balance
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:29'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:40'!
 test04_WithdrawValueMustBePositive 
 
-	| account withdrawValue |
+	| receptiveAccount withdrawValue |
 	
-	account := ReceptiveAccount new.
+	receptiveAccount := ReceptiveAccount new.
 	withdrawValue := 50 * peso.
 	
-	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: account) value
+	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: receptiveAccount) value
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:36'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:45'!
 test05_ReceptiveAccountKnowsRegisteredTransactions 
 
-	| account deposit withdraw |
+	| receptiveAccount deposit withdraw |
 	
-	account := ReceptiveAccount new.
-	deposit := Deposit register: 100 * peso on: account.
-	withdraw := Withdraw register: 50 * peso on: account.
+	receptiveAccount := ReceptiveAccount new.
+	deposit := Deposit register: 100 * peso on: receptiveAccount.
+	withdraw := Withdraw register: 50 * peso on: receptiveAccount.
 		
-	self assert: (account hasRegistered: deposit).
-	self assert: (account hasRegistered: withdraw).
+	self assert: (receptiveAccount hasRegistered: deposit).
+	self assert: (receptiveAccount hasRegistered: withdraw).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:45'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:50'!
 test06_ReceptiveAccountDoNotKnowNotRegisteredTransactions
 
-	| account deposit withdraw |
+	| receptiveAccount deposit withdraw |
 	
-	account := ReceptiveAccount new.
+	receptiveAccount := ReceptiveAccount new.
 	deposit :=  Deposit for: 100 * peso.
 	withdraw := Withdraw for: 50 * peso.
 		
-	self deny: (account hasRegistered: deposit).
-	self deny: (account hasRegistered: withdraw).
+	self deny: (receptiveAccount hasRegistered: deposit).
+	self deny: (receptiveAccount hasRegistered: withdraw).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/9/2024 13:09:51'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'fs 5/10/2024 14:52:55'!
 test07_AccountKnowsItsTransactions 
 
-	| account deposit |
+	| receptiveAccount deposit |
 	
-	account := ReceptiveAccount new.
+	receptiveAccount := ReceptiveAccount new.
 	
-	deposit := Deposit register: 50 * peso on: account.
+	deposit := Deposit register: 50 * peso on: receptiveAccount.
 		
-	self assert: 1 equals: account transactions size.
-	self assert: account transactions includes: deposit.
+	self assert: 1 equals: receptiveAccount transactions size.
+	self assert: receptiveAccount transactions includes: deposit.
 ! !
 
 
@@ -499,13 +505,13 @@ test_02_theNetTransferForAReceptiveAccountWithATransferWithdrawlIsCorrect
 	
 	self assert: senderNetTransferCalculator generateReport = (-100 * peso).! !
 
-!ReportTest methodsFor: 'Net Transfer report tests' stamp: 'fs 5/9/2024 12:51:06'!
+!ReportTest methodsFor: 'Net Transfer report tests' stamp: 'fs 5/10/2024 13:39:00'!
 test_03_anEmptyPortfolioGeneratesANetTransferReportOfZeroPesos
-	| aPortfolio netTransferCalculator |
+	| anEmptyPortfolio netTransferCalculator |
 	
-	aPortfolio := Portfolio new.
+	anEmptyPortfolio := Portfolio new.
 	
-	netTransferCalculator := NetTransferCalculator newFor: aPortfolio.
+	netTransferCalculator := NetTransferCalculator newFor: anEmptyPortfolio.
 	
 	self assert: netTransferCalculator generateReport = (0 * peso).
 ! !
